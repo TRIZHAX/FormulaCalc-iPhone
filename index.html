@@ -12,17 +12,17 @@
 <title>FormulaCalc iPhone</title>
 <style>
 :root{--bg:#050505;--panel:#151515;--muted:#8e8e93;--orange:#ff9f0a;--key:#333336;--key2:#a5a5a8;--white:#fff;--green:#30d158}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#242426 0%,#090909 46%,#000 100%);color:var(--white);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;min-height:100vh;display:flex;justify-content:center;padding:22px 14px}
-.app{width:min(100%,430px);min-height:calc(100vh - 44px);display:flex;flex-direction:column;gap:16px}
-.top{display:flex;align-items:center;justify-content:space-between;padding:4px 3px;gap:10px}.brand{font-weight:700;letter-spacing:-.5px;font-size:20px}.sub{font-size:12px;color:var(--muted);margin-top:3px}.pill{font-size:12px;color:#ddd;background:#242426;border:1px solid #3a3a3c;padding:7px 10px;border-radius:99px}.head-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}.history-toggle,.hide-formula,.install-toggle{border:1px solid #3a3a3e;background:#242426;color:#fff;border-radius:999px;padding:9px 11px;font:inherit;font-size:12px;cursor:pointer}.install-toggle{border:1px solid #4a3a21;background:#33230d;color:#ffb84d;border-radius:999px;padding:9px 11px;font:inherit;font-size:12px;cursor:pointer}.history-panel{display:none;background:#151517;border:1px solid #303034;border-radius:20px;padding:14px}.history-panel.open{display:block}.history-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.history-head h2{font-size:16px}.history-actions{display:flex;gap:7px}.history-actions button{border:0;background:#2c2c30;color:#eee;border-radius:9px;padding:7px 9px;font:inherit;font-size:12px}.history-list{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow:auto}.history-item{padding:10px 11px;background:#202023;border-radius:12px}.history-expression{font-size:12px;color:#a5a5ac;overflow-wrap:anywhere}.history-result{font-size:18px;margin-top:3px;overflow-wrap:anywhere}.history-empty{color:#8e8e93;font-size:13px;padding:8px 2px}
-.screen{background:linear-gradient(160deg,#171719,#080808);border:1px solid #252527;border-radius:28px;padding:20px 18px 16px;box-shadow:0 18px 50px #0008}
+*{box-sizing:border-box}body{margin:0;background:#171719;color:var(--white);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;min-height:100vh;display:flex;justify-content:center;padding:0;align-items:center}
+.app{width:min(100%,490px);min-height:100svh;display:flex;flex-direction:column;gap:0;background:#000;padding: max(22px,env(safe-area-inset-top)) 28px max(24px,env(safe-area-inset-bottom));border:8px solid #bfc0c4;border-radius:58px;box-shadow:0 0 0 2px #68696d;overflow:hidden}
+.top{display:flex;align-items:center;justify-content:space-between;padding:0 0 0;gap:10px;min-height:42px}.brand{font-weight:600;letter-spacing:-.5px;font-size:0}.sub{font-size:0;color:var(--muted);margin-top:3px}.pill{font-size:12px;color:#ddd;background:#242426;border:1px solid #3a3a3c;padding:7px 10px;border-radius:99px}.head-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.history-toggle,.hide-formula,.install-toggle{border:1px solid #3a3a3e;background:#242426;color:#fff;border-radius:50%;width:50px;height:50px;padding:0;font:inherit;font-size:0;cursor:pointer;position:relative}.install-toggle{border:1px solid #333;background:#242426;color:#fff;border-radius:50%;width:50px;height:50px;padding:0;font-size:0}.history-panel{display:none;background:#151517;border:1px solid #303034;border-radius:20px;padding:14px}.history-panel.open{display:block}.history-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.history-head h2{font-size:16px}.history-actions{display:flex;gap:7px}.history-actions button{border:0;background:#2c2c30;color:#eee;border-radius:9px;padding:7px 9px;font:inherit;font-size:12px}.history-list{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow:auto}.history-item{padding:10px 11px;background:#202023;border-radius:12px}.history-expression{font-size:12px;color:#a5a5ac;overflow-wrap:anywhere}.history-result{font-size:18px;margin-top:3px;overflow-wrap:anywhere}.history-empty{color:#8e8e93;font-size:13px;padding:8px 2px}
+.screen{background:#000;border:0;border-radius:0;padding:0;box-shadow:none;display:flex;flex-direction:column;flex:1}
 .formula-section{display:none}.formula-section.visible{display:block}.note{display:none!important}
-.mode-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:9px}
-.display{min-height:76px;display:flex;align-items:flex-end;justify-content:flex-end;overflow:hidden;font-size:clamp(36px,10vw,58px);font-weight:300;letter-spacing:-2px;white-space:nowrap;line-height:1.1}
-.expression{text-align:right;color:var(--muted);font-size:14px;min-height:21px;margin-top:7px;overflow-wrap:anywhere}
-.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
-.key{border:0;border-radius:50%;aspect-ratio:1;background:var(--key);color:#fff;font-size:clamp(20px,6vw,27px);font-weight:400;cursor:pointer;transition:filter .12s,transform .08s;display:flex;align-items:center;justify-content:center;user-select:none}
-.key:active{filter:brightness(1.45);transform:scale(.96)}.key.light{background:var(--key2);color:#111}.key.operator{background:var(--orange);font-size:30px}.key.operator.active{background:#fff;color:var(--orange)}.key.zero{grid-column:span 2;aspect-ratio:auto;border-radius:999px;justify-content:flex-start;padding-left:28px}
+.mode-label{font-size:0;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:0}
+.display{min-height:0;flex:1;max-height:240px;display:flex;align-items:flex-end;justify-content:flex-end;overflow:hidden;font-size:clamp(48px,12vw,72px);font-weight:300;letter-spacing:-2px;white-space:nowrap;line-height:1.1;padding:0 0 2px}
+.expression{text-align:right;color:var(--muted);font-size:clamp(17px,4vw,28px);min-height:35px;margin-top:0;overflow-wrap:anywhere}
+.keys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:18px;padding-bottom:0}
+.key{border:0;border-radius:50%;aspect-ratio:1;background:linear-gradient(#3b3b3d,#303033);color:#fff;font-size:clamp(20px,6vw,34px);font-weight:400;cursor:pointer;transition:filter .12s,transform .08s;display:flex;align-items:center;justify-content:center;user-select:none}
+.key:active{filter:brightness(1.45);transform:scale(.96)}.key.light{background:linear-gradient(#a5a5a8,#77777a);color:#fff}.key.operator{background:var(--orange);font-size:30px}.key.operator.active{background:#fff;color:var(--orange)}.key.zero{grid-column:span 1;aspect-ratio:1;border-radius:50%;justify-content:center;padding-left:0}
 .section{background:#111113;border:1px solid #29292c;border-radius:24px;padding:17px}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
 h2{font-size:17px;margin:0;letter-spacing:-.3px}.tag{font-size:11px;color:#c6c6c9;background:#252528;border-radius:7px;padding:5px 7px}
@@ -58,24 +58,74 @@ select:focus,input:focus{border-color:var(--orange)}
 
 .install-help{position:fixed;inset:0;z-index:2000;background:#000b;display:flex;align-items:center;justify-content:center;padding:20px}.install-help[hidden]{display:none}.install-card{position:relative;width:min(100%,360px);background:#202023;border:1px solid #414146;border-radius:26px;padding:25px 22px 20px;box-shadow:0 20px 70px #000c}.install-card h2{font-size:21px;margin:12px 0 9px}.install-card p,.install-card li{font-size:14px;color:#c7c7cc;line-height:1.5}.install-card ol{padding-left:22px}.install-symbol{width:48px;height:48px;border-radius:15px;background:var(--orange);color:#111;display:grid;place-items:center;font-size:30px;font-weight:500}.install-close{position:absolute;right:13px;top:13px;border:0;border-radius:50%;width:32px;height:32px;background:#38383d;color:#fff;font-size:22px;cursor:pointer}.install-foot{font-size:11px!important;color:#929299!important;margin-top:18px}
 @media(max-width:380px){.brand{font-size:18px}.sub{font-size:10px}.install-toggle,.history-toggle{padding:8px 9px;font-size:11px}.top{align-items:flex-start}}
+.statusbar{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 42px;font-size:17px;font-weight:600;flex:none}.status-icons{font-size:15px;letter-spacing:1px}.head-actions button{font-size:0}.history-toggle:after{content:"◷";font-size:28px}.install-toggle:after{content:"▦";font-size:24px}.formula-section.visible{margin-top:16px}.fab{width:54px;height:54px}.note{display:none!important}@media(max-width:520px){.app{width:100%;min-height:100svh;border:0;border-radius:0;padding: max(16px,env(safe-area-inset-top)) 24px max(20px,env(safe-area-inset-bottom));box-shadow:none}.statusbar{padding:0 18px}.screen{min-height:0}.display{max-height:none}.keys{gap:8px}.key{font-size:clamp(24px,7vw,34px)}}@media(min-width:521px){.app{height:min(100svh,1000px);min-height:700px}.screen{min-height:0}}
+
+/* App-only layout: no phone mockup or device frame */
+body{background:#000;display:block;min-height:100vh;padding:0;}
+.app{width:100%;max-width:560px;min-height:100svh;height:auto;margin:0 auto;border:0;border-radius:0;box-shadow:none;padding:24px clamp(18px,5vw,30px) 28px;overflow:visible;}
+.statusbar{display:none;}
+.top{min-height:52px;margin-bottom:8px;}
+.screen{min-height:calc(100svh - 100px);}
+.display{min-height:150px;}
+.keys{gap:clamp(8px,2vw,12px);margin-top:18px;}
+.key{width:100%;}
+@media(min-width:650px){body{padding:0}.app{width:100%;max-width:560px;height:auto;min-height:100svh}.screen{min-height:calc(100svh - 100px)}}
+@media(max-width:520px){.app{width:100%;max-width:none;min-height:100svh;border:0;border-radius:0;box-shadow:none;padding:max(18px,env(safe-area-inset-top)) 22px max(22px,env(safe-area-inset-bottom))}.screen{min-height:calc(100svh - 90px)}.display{min-height:150px}}
+
+/* Collapsible Computational Science notes */
+.notes-section{margin:16px 0 0;background:#111113;border:1px solid #2d2d31;border-radius:18px;overflow:hidden;color:#f5f5f7}
+.notes-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;background:#1b1b1e;color:#f5f5f7;border:0;text-align:left;font:inherit;font-size:13px;font-weight:750;letter-spacing:.45px;cursor:pointer}
+.notes-toggle span{font-size:22px;color:var(--orange);line-height:1}
+.computational-notes{padding:16px;max-height:65vh;overflow:auto;font-size:13px;line-height:1.55;color:#d3d3d8}
+.computational-notes[hidden]{display:none}
+.computational-notes h3{font-size:14px;color:#ffb340;margin:16px 0 6px}
+.computational-notes h3:first-child{margin-top:0}
+.computational-notes ul{padding-left:19px;margin:5px 0 12px}
+.computational-notes li{margin:0 0 6px}
+.notes-formula{padding:12px;background:#202023;border-radius:12px;line-height:1.9;overflow-wrap:anywhere}
+
 </style>
 </head>
 <body>
 <main class="app">
-  <header class="top"><div><div class="brand">Calculator</div><div class="sub">Math • Modeling • Simulation</div></div><div class="head-actions"><button id="installButton" class="install-toggle" type="button">＋ Add Home</button><button id="historyToggle" class="history-toggle" type="button" aria-expanded="false">History</button></div></header>
+  <header class="top"><div></div><div class="head-actions"><button id="historyToggle" class="history-toggle" type="button" aria-expanded="false" aria-label="History" title="History">◷</button><button id="installButton" class="install-toggle" type="button" aria-label="Formula mode" title="Formula mode">▦</button></div></header>
   <section class="screen" aria-label="Basic calculator">
     <div class="mode-label">Basic calculator</div>
-    <div id="display" class="display" aria-live="polite">0</div>
     <div id="expression" class="expression">Ready</div>
+    <div id="display" class="display" aria-live="polite">0</div>
     <div class="keys">
-      <button class="key light" data-action="clear">AC</button><button class="key light" data-action="sign">+/−</button><button class="key light" data-action="percent">%</button><button class="key operator" data-op="/">÷</button>
+      <button class="key light" data-action="backspace" aria-label="Delete last digit">⌫</button><button class="key light" data-action="clear">AC</button><button class="key light" data-action="percent">%</button><button class="key operator" data-op="/">÷</button>
       <button class="key" data-num="7">7</button><button class="key" data-num="8">8</button><button class="key" data-num="9">9</button><button class="key operator" data-op="*">×</button>
       <button class="key" data-num="4">4</button><button class="key" data-num="5">5</button><button class="key" data-num="6">6</button><button class="key operator" data-op="-">−</button>
       <button class="key" data-num="1">1</button><button class="key" data-num="2">2</button><button class="key" data-num="3">3</button><button class="key operator" data-op="+">+</button>
-      <button class="key zero" data-num="0">0</button><button class="key" data-action="decimal">.</button><button class="key operator" data-action="equals">=</button>
+      <button class="key light" data-action="sign">+/−</button><button class="key" data-num="0">0</button><button class="key" data-action="decimal">.</button><button class="key operator" data-action="equals">=</button>
     </div>
   </section>
   <section id="historyPanel" class="history-panel" aria-label="Calculation history"><div class="history-head"><h2>History</h2><div class="history-actions"><button id="clearHistory" type="button">Clear</button><button id="closeHistory" type="button">Close</button></div></div><div id="historyList" class="history-list"><div class="history-empty">No calculations yet.</div></div></section>
+  <section class="notes-section" aria-label="Computational science notes">
+    <button id="notesToggle" class="notes-toggle" type="button" aria-expanded="false" aria-controls="computationalNotes">📘 NOTES FOR COMPUTATIONAL SCIENCE <span id="notesChevron">＋</span></button>
+    <div id="computationalNotes" class="computational-notes" hidden>
+      <h3>Key Components of a Computational Model</h3>
+      <ul>
+        <li><b>Problem:</b> Real-world situation being studied.</li><li><b>Variables:</b> Quantities that can change.</li><li><b>Parameters:</b> Fixed or controlled values used by the model.</li><li><b>Assumptions:</b> Conditions accepted to simplify the problem.</li><li><b>Mathematical relationships:</b> Equations describing relationships between variables.</li><li><b>Algorithm:</b> Step-by-step procedure for solving the problem.</li><li><b>Computational implementation:</b> Converts the model into computer code.</li><li><b>Output:</b> Results generated by the model.</li><li><b>Validation:</b> Checks whether the model reasonably represents reality.</li>
+      </ul>
+      <h3>Simulation Methods</h3>
+      <ul><li><b>Simulation:</b> A computer model imitating a real-world system over time.</li><li><b>Discrete simulation:</b> Events occur at specific points in time.</li><li><b>Continuous simulation:</b> Variables change continuously using mathematical equations.</li><li><b>Important concepts:</b> Time, events, state variables, inputs, outputs, initial conditions, random variables, simulation time, and data collection.</li></ul>
+      <h3>Scientific Programming</h3>
+      <ul><li><b>Scientific programming:</b> Using programming languages and computational tools to solve scientific and mathematical problems.</li><li><b>Common tools:</b> Python (NumPy, SciPy, Matplotlib, pandas), MATLAB, R, Julia, and Jupyter Notebook.</li><li><b>Uses:</b> Numerical calculations, matrix operations, statistical analysis, integration, differentiation, data processing, simulation, and visualization.</li></ul>
+      <h3>Data Visualization</h3>
+      <ul><li><b>Data visualization:</b> Graphical representation of data to reveal patterns, trends, relationships, and comparisons.</li><li><b>Bar chart:</b> Compare categories; <b>line graph:</b> trends over time; <b>scatter plot:</b> relationships; <b>histogram:</b> distributions; <b>pie chart:</b> proportions; <b>heat map:</b> values across two dimensions; <b>box plot:</b> compare distributions.</li><li><b>Scientific visualization:</b> Presents simulations, physical measurements, geographic data, mathematical functions, and 3D models.</li></ul>
+      <h3>High-Performance Computing (HPC)</h3>
+      <ul><li><b>HPC:</b> Powerful computing systems and parallel processing for intensive problems.</li><li><b>Key concepts:</b> Parallel and distributed computing, multicore processors, GPUs, clusters, supercomputers, parallel algorithms, task decomposition, data partitioning, speedup, efficiency, and scalability.</li><li><b>Importance:</b> Processes very large datasets, complex models, large-scale simulations, and intensive calculations.</li></ul>
+      <h3>Computational Applications</h3>
+      <ul><li><b>Physics:</b> Motion, fluid dynamics, electromagnetic systems, and particle interactions.</li><li><b>Biology:</b> Population dynamics, genetic information, ecosystems, and disease transmission.</li><li><b>Engineering:</b> Structural analysis, circuit simulation, design optimization, fluid and thermal analysis.</li><li><b>Environment:</b> Climate change, air pollution, water quality, and natural disasters.</li><li><b>Artificial intelligence:</b> Machine learning, pattern recognition, prediction, classification, and computer vision.</li></ul>
+      <h3>Model Validation and Computational Accuracy</h3>
+      <ul><li><b>Verification:</b> Checks whether the program correctly implements the intended model.</li><li><b>Validation:</b> Checks whether the model adequately represents the real-world system.</li><li><b>Error sources:</b> Measurement, rounding, truncation, incorrect assumptions/data, programming errors, and numerical instability.</li></ul>
+      <div class="notes-formula"><b>Absolute Error:</b> Ea = |xtrue − xapprox|<br><b>Relative Error:</b> Er = |xtrue − xapprox| / |xtrue|<br><b>Percentage Error:</b> Ep = Er × 100%</div>
+      <h3>Emerging Trends in Computational Science</h3>
+      <ul><li><b>Artificial intelligence:</b> Learning patterns, prediction, classification, recognition, and decision support.</li><li><b>Big data:</b> Volume, velocity, variety, veracity, and value.</li><li><b>Cloud computing:</b> Network-based storage, processing power, databases, virtual machines, and AI services.</li><li><b>Other areas:</b> Edge computing, quantum computing, digital twins, Internet of Things, advanced simulation, and automated scientific discovery.</li></ul>
+    </div>
+  </section>
   <section id="formulaSection" class="section formula-section">
     <div class="section-head"><h2>Formula mode</h2><button id="hideFormula" class="hide-formula" type="button">Hide formula mode</button></div>
     <select id="formulaSelect" aria-label="Choose formula">
@@ -132,7 +182,7 @@ function chooseOp(op){const val=Number(current);if(operator&& !waiting)compute()
 function compute(){if(operator===null||previous===null)return;const a=previous,b=Number(current);let out=operator==='+'?a+b:operator==='-'?a-b:operator==='*'?a*b:b===0?NaN:a/b;const calculation=fmt(a)+' '+({'/':'÷','*':'×','-':'−','+':'+'}[operator])+' '+fmt(b);$('expression').textContent=calculation+' =';current=fmt(out).replace(/,/g,'');saveHistory(calculation,current);previous=null;operator=null;waiting=true;justEvaluated=true;updateDisplay();document.querySelectorAll('.key.operator').forEach(b=>b.classList.remove('active'));}
 document.querySelectorAll('[data-num]').forEach(b=>b.addEventListener('click',()=>inputNum(b.dataset.num)));
 document.querySelectorAll('[data-op]').forEach(b=>b.addEventListener('click',()=>chooseOp(b.dataset.op)));
-document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action;if(a==='clear'){current='0';previous=null;operator=null;waiting=false;justEvaluated=false;$('expression').textContent='Ready';document.querySelectorAll('.key.operator').forEach(x=>x.classList.remove('active'));updateDisplay();}if(a==='decimal'&&!current.includes('.'))current+='.';if(a==='sign')current=String(Number(current)*-1);if(a==='percent')current=String(Number(current)/100);if(a==='equals')compute();updateDisplay();}));
+document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action;if(a==='backspace'){if(!waiting&&!justEvaluated&&current.length>1)current=current.slice(0,-1);else current='0';}if(a==='clear'){current='0';previous=null;operator=null;waiting=false;justEvaluated=false;$('expression').textContent='Ready';document.querySelectorAll('.key.operator').forEach(x=>x.classList.remove('active'));updateDisplay();}if(a==='decimal'&&!current.includes('.'))current+='.';if(a==='sign')current=String(Number(current)*-1);if(a==='percent')current=String(Number(current)/100);if(a==='equals')compute();updateDisplay();}));
 document.addEventListener('keydown',e=>{if(/[0-9]/.test(e.key))inputNum(e.key);else if(e.key==='.')document.querySelector('[data-action="decimal"]').click();else if(['+','-','*','/'].includes(e.key))chooseOp(e.key);else if(e.key==='Enter'||e.key==='=')compute();else if(e.key==='Escape')document.querySelector('[data-action="clear"]').click();});
 const defs={
 discrete:{formula:'P(t) = P₀(1 + r)ᵗ',desc:'Discrete growth: the rate is applied once per time period.',fields:[['p0','Initial population / amount (P₀)',10000],['r','Growth rate (%)',2],['t','Time periods (t)',5]],calc:v=>{let x=v.p0*Math.pow(1+v.r/100,v.t);return [x,'Estimated amount after '+v.t+' periods.']}},
@@ -233,7 +283,31 @@ $('installButton').addEventListener('click',async()=>{
 $('closeInstallHelp').addEventListener('click',hideInstallHelp);
 installHelp.addEventListener('click',e=>{if(e.target===installHelp)hideInstallHelp();});
 if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
-$('formulaSelect').addEventListener('change',()=>{renderFields();buildFormulaNav();});$('calculate').addEventListener('click',runFormula);$('historyToggle').addEventListener('click',()=>toggleHistory());$('closeHistory').addEventListener('click',()=>toggleHistory(false));$('clearHistory').addEventListener('click',()=>{calcHistory=[];try{localStorage.removeItem('iphoneCalcHistory')}catch(e){}renderHistory()});$('hideFormula').addEventListener('click',()=>{$('formulaSection').classList.remove('visible');$('formulaMenu').classList.remove('open');$('formulaFab').setAttribute('aria-expanded','false');$('formulaFab').textContent='＋';});renderFields();buildFormulaNav();renderHistory();
+$('installButton').addEventListener('click',()=>{const section=$('formulaSection');section.classList.toggle('visible');if(section.classList.contains('visible'))section.scrollIntoView({behavior:'smooth',block:'start'});});$('formulaSelect').addEventListener('change',()=>{renderFields();buildFormulaNav();});$('calculate').addEventListener('click',runFormula);$('historyToggle').addEventListener('click',()=>toggleHistory());$('closeHistory').addEventListener('click',()=>toggleHistory(false));$('clearHistory').addEventListener('click',()=>{calcHistory=[];try{localStorage.removeItem('iphoneCalcHistory')}catch(e){}renderHistory()});$('hideFormula').addEventListener('click',()=>{$('formulaSection').classList.remove('visible');$('formulaMenu').classList.remove('open');$('formulaFab').setAttribute('aria-expanded','false');$('formulaFab').textContent='＋';});renderFields();buildFormulaNav();renderHistory();
+const notesToggle=$('notesToggle');
+notesToggle.addEventListener('click',()=>{const panel=$('computationalNotes');const opening=panel.hidden;panel.hidden=!opening;notesToggle.setAttribute('aria-expanded',String(opening));$('notesChevron').textContent=opening?'−':'＋';});
+
 </script>
 </body>
 </html>
+<style>
+/* Reference-inspired app surface: no physical phone, just the calculator UI */
+body{background:#000!important;color:#f5f5f7!important;display:flex!important;justify-content:center!important;align-items:flex-start!important;padding:28px 16px!important;min-height:100svh!important}
+.app{width:min(100%,520px)!important;max-width:520px!important;min-height:0!important;height:auto!important;margin:0 auto!important;padding:22px 18px 24px!important;border:2px solid #29292c!important;border-radius:62px!important;background:#000!important;box-shadow:0 0 0 1px #111!important;overflow:hidden!important}
+.top{min-height:54px!important;margin:0 6px 8px!important;align-items:center!important}
+.history-toggle,.install-toggle{width:48px!important;height:48px!important;background:linear-gradient(145deg,#303033,#19191b)!important;border:1px solid #303034!important;box-shadow:inset 0 1px 0 #ffffff0c!important}
+.history-toggle:after{content:"◴"!important;font-size:25px!important}
+.install-toggle:after{content:"▤"!important;font-size:23px!important}
+.screen{min-height:0!important;flex:none!important;padding:0 0 0!important;background:#000!important}
+.display{min-height:145px!important;max-height:none!important;flex:none!important;font-size:clamp(52px,11vw,76px)!important;padding:0 2px 3px!important}
+.expression{font-size:clamp(17px,4vw,27px)!important;min-height:36px!important;margin:0!important;padding:0 3px!important}
+.keys{gap:10px!important;margin-top:18px!important;padding-bottom:0!important}
+.key{aspect-ratio:1!important;border-radius:50%!important;font-size:clamp(25px,5.8vw,36px)!important}
+.key.light{background:linear-gradient(145deg,#77777a,#505053)!important}
+.key.operator{background:#ff9f0a!important;color:#fff!important;font-size:clamp(27px,5.8vw,36px)!important}
+.key.operator.active{background:#fff!important;color:#ff9f0a!important}
+.formula-section.visible{margin-top:18px!important}
+.fab-wrap{right:max(22px,calc((100vw - 520px)/2 + 18px))!important;bottom:22px!important}
+@media(max-width:520px){body{padding:12px 10px!important;align-items:flex-start!important}.app{width:100%!important;min-height:calc(100svh - 24px)!important;padding:max(16px,env(safe-area-inset-top)) 17px max(20px,env(safe-area-inset-bottom))!important;border-radius:48px!important;border:2px solid #29292c!important;box-shadow:0 0 0 1px #111!important}.display{min-height:clamp(125px,25vh,190px)!important}.keys{gap:clamp(7px,2vw,10px)!important}.key{font-size:clamp(24px,7vw,35px)!important}}
+@media(min-width:700px){body{padding-top:28px!important;padding-bottom:28px!important}.app{min-height:0!important}.screen{min-height:0!important}}
+</style>
