@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FormulaCalc">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>FormulaCalc iPhone</title>
+<style>
+:root{--bg:#050505;--panel:#151515;--muted:#8e8e93;--orange:#ff9f0a;--key:#333336;--key2:#a5a5a8;--white:#fff;--green:#30d158}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#242426 0%,#090909 46%,#000 100%);color:var(--white);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;min-height:100vh;display:flex;justify-content:center;padding:22px 14px}
+.app{width:min(100%,430px);min-height:calc(100vh - 44px);display:flex;flex-direction:column;gap:16px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:4px 3px;gap:10px}.brand{font-weight:700;letter-spacing:-.5px;font-size:20px}.sub{font-size:12px;color:var(--muted);margin-top:3px}.pill{font-size:12px;color:#ddd;background:#242426;border:1px solid #3a3a3c;padding:7px 10px;border-radius:99px}.head-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}.history-toggle,.hide-formula,.install-toggle{border:1px solid #3a3a3e;background:#242426;color:#fff;border-radius:999px;padding:9px 11px;font:inherit;font-size:12px;cursor:pointer}.install-toggle{border:1px solid #4a3a21;background:#33230d;color:#ffb84d;border-radius:999px;padding:9px 11px;font:inherit;font-size:12px;cursor:pointer}.history-panel{display:none;background:#151517;border:1px solid #303034;border-radius:20px;padding:14px}.history-panel.open{display:block}.history-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.history-head h2{font-size:16px}.history-actions{display:flex;gap:7px}.history-actions button{border:0;background:#2c2c30;color:#eee;border-radius:9px;padding:7px 9px;font:inherit;font-size:12px}.history-list{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow:auto}.history-item{padding:10px 11px;background:#202023;border-radius:12px}.history-expression{font-size:12px;color:#a5a5ac;overflow-wrap:anywhere}.history-result{font-size:18px;margin-top:3px;overflow-wrap:anywhere}.history-empty{color:#8e8e93;font-size:13px;padding:8px 2px}
+.screen{background:linear-gradient(160deg,#171719,#080808);border:1px solid #252527;border-radius:28px;padding:20px 18px 16px;box-shadow:0 18px 50px #0008}
+.formula-section{display:none}.formula-section.visible{display:block}.note{display:none!important}
+.mode-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:9px}
+.display{min-height:76px;display:flex;align-items:flex-end;justify-content:flex-end;overflow:hidden;font-size:clamp(36px,10vw,58px);font-weight:300;letter-spacing:-2px;white-space:nowrap;line-height:1.1}
+.expression{text-align:right;color:var(--muted);font-size:14px;min-height:21px;margin-top:7px;overflow-wrap:anywhere}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+.key{border:0;border-radius:50%;aspect-ratio:1;background:var(--key);color:#fff;font-size:clamp(20px,6vw,27px);font-weight:400;cursor:pointer;transition:filter .12s,transform .08s;display:flex;align-items:center;justify-content:center;user-select:none}
+.key:active{filter:brightness(1.45);transform:scale(.96)}.key.light{background:var(--key2);color:#111}.key.operator{background:var(--orange);font-size:30px}.key.operator.active{background:#fff;color:var(--orange)}.key.zero{grid-column:span 2;aspect-ratio:auto;border-radius:999px;justify-content:flex-start;padding-left:28px}
+.section{background:#111113;border:1px solid #29292c;border-radius:24px;padding:17px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+h2{font-size:17px;margin:0;letter-spacing:-.3px}.tag{font-size:11px;color:#c6c6c9;background:#252528;border-radius:7px;padding:5px 7px}
+select,input{width:100%;background:#202023;color:#fff;border:1px solid #3a3a3e;border-radius:13px;padding:13px 12px;font:inherit;font-size:15px;outline:none}
+select:focus,input:focus{border-color:var(--orange)}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.field label{display:block;color:#aaaab0;font-size:12px;margin:0 0 6px 3px}
+.formula{color:#d5d5d8;background:#1d1d20;border-radius:13px;padding:12px 13px;font-size:14px;margin:13px 0;line-height:1.45}
+.calculate{width:100%;border:0;border-radius:14px;background:var(--orange);color:#151515;font-size:16px;font-weight:700;padding:14px;cursor:pointer;margin-top:12px}
+.result{margin-top:12px;border:1px solid #2e4435;background:#102016;border-radius:15px;padding:14px;display:none}
+.result .rlabel{font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:#83d99b}.result .rvalue{font-size:27px;letter-spacing:-.7px;margin-top:4px;overflow-wrap:anywhere}.result .detail{font-size:12px;color:#a6c8af;margin-top:5px;line-height:1.4}
+.note{font-size:11px;line-height:1.5;color:#77777e;text-align:center;padding:0 12px 12px}
+
+/* Floating formula navigation */
+.fab-wrap{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(20px,env(safe-area-inset-bottom));z-index:1000;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.fab{width:62px;height:62px;border:0;border-radius:50%;background:var(--orange);color:#111;box-shadow:0 8px 28px #0009,0 0 0 5px #ff9f0a20;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;transition:transform .2s,background .2s}
+.fab:active{transform:scale(.94)}.fab[aria-expanded="true"]{background:#fff;color:var(--orange);transform:rotate(45deg)}
+.fab-menu{width:min(320px,calc(100vw - 28px));max-height:min(65vh,520px);overflow:auto;background:#19191c;border:1px solid #38383d;border-radius:22px;padding:10px;box-shadow:0 18px 55px #000b;display:none}
+.fab-menu.open{display:block;animation:menuIn .18s ease-out}
+@keyframes menuIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.menu-title{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#96969d;padding:9px 10px 11px}
+.nav-option{width:100%;display:flex;align-items:center;gap:11px;border:0;background:transparent;color:#f5f5f7;padding:12px 10px;border-radius:13px;text-align:left;font:inherit;cursor:pointer}
+.nav-option:hover,.nav-option:focus-visible{background:#303034;outline:none}
+.nav-option.selected{background:#352714}
+.nav-icon{width:34px;height:34px;flex:none;border-radius:11px;background:#2b2b30;display:flex;align-items:center;justify-content:center;color:var(--orange);font-size:17px}
+.nav-option.selected .nav-icon{background:var(--orange);color:#111}
+.nav-copy{min-width:0;flex:1}.nav-name{font-size:13px;font-weight:600;line-height:1.3}.nav-formula{font-size:11px;color:#a5a5ac;line-height:1.35;margin-top:3px}
+.nav-check{color:var(--orange);font-size:17px}
+@media(max-width:350px){.fab{width:56px;height:56px}.fab-menu{max-height:58vh}}
+@media(min-width:650px){body{padding:32px 18px}.app{width:430px}.key{font-size:27px}}
+
+@media(max-width:350px){body{padding:12px 9px}.app{gap:12px}.screen{padding:16px 13px}.keys{gap:7px}.key{font-size:20px}.field-grid{grid-template-columns:1fr}}
+
+.install-help{position:fixed;inset:0;z-index:2000;background:#000b;display:flex;align-items:center;justify-content:center;padding:20px}.install-help[hidden]{display:none}.install-card{position:relative;width:min(100%,360px);background:#202023;border:1px solid #414146;border-radius:26px;padding:25px 22px 20px;box-shadow:0 20px 70px #000c}.install-card h2{font-size:21px;margin:12px 0 9px}.install-card p,.install-card li{font-size:14px;color:#c7c7cc;line-height:1.5}.install-card ol{padding-left:22px}.install-symbol{width:48px;height:48px;border-radius:15px;background:var(--orange);color:#111;display:grid;place-items:center;font-size:30px;font-weight:500}.install-close{position:absolute;right:13px;top:13px;border:0;border-radius:50%;width:32px;height:32px;background:#38383d;color:#fff;font-size:22px;cursor:pointer}.install-foot{font-size:11px!important;color:#929299!important;margin-top:18px}
+@media(max-width:380px){.brand{font-size:18px}.sub{font-size:10px}.install-toggle,.history-toggle{padding:8px 9px;font-size:11px}.top{align-items:flex-start}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="top"><div><div class="brand">Calculator</div><div class="sub">Math • Modeling • Simulation</div></div><div class="head-actions"><button id="installButton" class="install-toggle" type="button">＋ Add Home</button><button id="historyToggle" class="history-toggle" type="button" aria-expanded="false">History</button></div></header>
+  <section class="screen" aria-label="Basic calculator">
+    <div class="mode-label">Basic calculator</div>
+    <div id="display" class="display" aria-live="polite">0</div>
+    <div id="expression" class="expression">Ready</div>
+    <div class="keys">
+      <button class="key light" data-action="clear">AC</button><button class="key light" data-action="sign">+/−</button><button class="key light" data-action="percent">%</button><button class="key operator" data-op="/">÷</button>
+      <button class="key" data-num="7">7</button><button class="key" data-num="8">8</button><button class="key" data-num="9">9</button><button class="key operator" data-op="*">×</button>
+      <button class="key" data-num="4">4</button><button class="key" data-num="5">5</button><button class="key" data-num="6">6</button><button class="key operator" data-op="-">−</button>
+      <button class="key" data-num="1">1</button><button class="key" data-num="2">2</button><button class="key" data-num="3">3</button><button class="key operator" data-op="+">+</button>
+      <button class="key zero" data-num="0">0</button><button class="key" data-action="decimal">.</button><button class="key operator" data-action="equals">=</button>
+    </div>
+  </section>
+  <section id="historyPanel" class="history-panel" aria-label="Calculation history"><div class="history-head"><h2>History</h2><div class="history-actions"><button id="clearHistory" type="button">Clear</button><button id="closeHistory" type="button">Close</button></div></div><div id="historyList" class="history-list"><div class="history-empty">No calculations yet.</div></div></section>
+  <section id="formulaSection" class="section formula-section">
+    <div class="section-head"><h2>Formula mode</h2><button id="hideFormula" class="hide-formula" type="button">Hide formula mode</button></div>
+    <select id="formulaSelect" aria-label="Choose formula">
+      <optgroup label="Growth & Finance">
+        <option value="discrete">Population growth — P(t) = P₀(1 + r)ᵗ</option>
+        <option value="continuous">Continuous growth / decay — P(t) = P₀eʳᵗ</option>
+        <option value="simple">Simple interest — A = P(1 + rt)</option>
+        <option value="compound">Compound interest — A = P(1 + r/n)ⁿᵗ</option>
+      </optgroup>
+      <optgroup label="Accuracy & Error">
+        <option value="absolute">Absolute error — |true − approximate|</option>
+        <option value="relative">Relative error — absolute error / |true|</option>
+        <option value="percentage">Percentage error — relative error × 100%</option>
+      </optgroup>
+      <optgroup label="Real-life Models">
+        <option value="temperature">Temperature conversion — °C / °F</option>
+        <option value="water">Water consumption — people × daily use × days</option>
+        <option value="electricity">Electricity cost — kWh × price per kWh</option>
+        <option value="bmi">BMI — weight / height²</option>
+        <option value="projectile">Projectile motion — ideal launch model</option>
+        <option value="rainfall">Rainwater collection — rainfall × area</option>
+        <option value="reduction">Consumption after reduction</option>
+      </optgroup>
+    </select>
+    <div id="formulaText" class="formula">P(t) = P₀(1 + r)ᵗ. Enter rate as a percent; for example, 2 for 2%.</div>
+    <div id="fields" class="field-grid"></div>
+    <button id="calculate" class="calculate">Calculate result</button>
+    <div id="result" class="result" aria-live="polite"><div class="rlabel">Result</div><div id="resultValue" class="rvalue"></div><div id="resultDetail" class="detail"></div></div>
+  </section>
+  <div class="note">Formula mode follows the topics in your uploaded lessons. Results are estimates; models depend on their assumptions. For projectile motion, air resistance is ignored.</div>
+</main>
+<div id="installHelp" class="install-help" role="dialog" aria-modal="true" aria-labelledby="installHelpTitle" hidden>
+  <div class="install-card"><button id="closeInstallHelp" class="install-close" type="button" aria-label="Close">×</button><div class="install-symbol">＋</div><h2 id="installHelpTitle">Add FormulaCalc to Home Screen</h2><p id="installHelpText">For quick access, add this calculator to your device's Home Screen.</p><ol id="installSteps"><li>Open this page in your browser.</li><li>Tap the browser's Share or menu button.</li><li>Choose <b>Add to Home Screen</b> and confirm.</li></ol><p class="install-foot">For the app-style install to work, publish the app files on an HTTPS website first. Opening the HTML file directly may not support installation.</p></div>
+</div>
+<div class="fab-wrap">
+  <nav id="formulaMenu" class="fab-menu" aria-label="Formula navigation">
+    <div class="menu-title">Choose a calculation</div>
+    <div id="formulaNavItems"></div>
+  </nav>
+  <button id="formulaFab" class="fab" type="button" aria-label="Open formula navigation" aria-controls="formulaMenu" aria-expanded="false" title="Choose a formula">＋</button>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let current='0', previous=null, operator=null, waiting=false, justEvaluated=false;
+let calcHistory=[];
+try{calcHistory=JSON.parse(localStorage.getItem('iphoneCalcHistory')||'[]')}catch(e){calcHistory=[]}
+function saveHistory(expression,result){calcHistory.unshift({expression,result,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});calcHistory=calcHistory.slice(0,50);try{localStorage.setItem('iphoneCalcHistory',JSON.stringify(calcHistory))}catch(e){}renderHistory()}
+function renderHistory(){const list=$('historyList');if(!list)return;list.innerHTML='';if(!calcHistory.length){list.innerHTML='<div class="history-empty">No calculations yet.</div>';return}calcHistory.forEach(item=>{const row=document.createElement('div');row.className='history-item';const ex=document.createElement('div');ex.className='history-expression';ex.textContent=item.expression+'  ·  '+item.time;const val=document.createElement('div');val.className='history-result';val.textContent=item.result;row.append(ex,val);list.append(row)})}
+function toggleHistory(force){const panel=$('historyPanel'),open=force===undefined?!panel.classList.contains('open'):force;panel.classList.toggle('open',open);$('historyToggle').setAttribute('aria-expanded',String(open));if(open)renderHistory()}
+function fmt(n){if(!Number.isFinite(n))return 'Error';return Number(n.toPrecision(10)).toLocaleString('en-US',{maximumFractionDigits:8});}
+function updateDisplay(){ $('display').textContent=current; }
+function inputNum(n){if(waiting||justEvaluated){current=n;waiting=false;justEvaluated=false;}else current=current==='0'?n:current+n;updateDisplay();}
+function chooseOp(op){const val=Number(current);if(operator&& !waiting)compute();previous=Number(current);operator=op;waiting=true;justEvaluated=false;$('expression').textContent=fmt(previous)+' '+({'/':'÷','*':'×','-':'−','+':'+'}[op]);document.querySelectorAll('.key.operator').forEach(b=>b.classList.toggle('active',b.dataset.op===op));}
+function compute(){if(operator===null||previous===null)return;const a=previous,b=Number(current);let out=operator==='+'?a+b:operator==='-'?a-b:operator==='*'?a*b:b===0?NaN:a/b;const calculation=fmt(a)+' '+({'/':'÷','*':'×','-':'−','+':'+'}[operator])+' '+fmt(b);$('expression').textContent=calculation+' =';current=fmt(out).replace(/,/g,'');saveHistory(calculation,current);previous=null;operator=null;waiting=true;justEvaluated=true;updateDisplay();document.querySelectorAll('.key.operator').forEach(b=>b.classList.remove('active'));}
+document.querySelectorAll('[data-num]').forEach(b=>b.addEventListener('click',()=>inputNum(b.dataset.num)));
+document.querySelectorAll('[data-op]').forEach(b=>b.addEventListener('click',()=>chooseOp(b.dataset.op)));
+document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action;if(a==='clear'){current='0';previous=null;operator=null;waiting=false;justEvaluated=false;$('expression').textContent='Ready';document.querySelectorAll('.key.operator').forEach(x=>x.classList.remove('active'));updateDisplay();}if(a==='decimal'&&!current.includes('.'))current+='.';if(a==='sign')current=String(Number(current)*-1);if(a==='percent')current=String(Number(current)/100);if(a==='equals')compute();updateDisplay();}));
+document.addEventListener('keydown',e=>{if(/[0-9]/.test(e.key))inputNum(e.key);else if(e.key==='.')document.querySelector('[data-action="decimal"]').click();else if(['+','-','*','/'].includes(e.key))chooseOp(e.key);else if(e.key==='Enter'||e.key==='=')compute();else if(e.key==='Escape')document.querySelector('[data-action="clear"]').click();});
+const defs={
+discrete:{formula:'P(t) = P₀(1 + r)ᵗ',desc:'Discrete growth: the rate is applied once per time period.',fields:[['p0','Initial population / amount (P₀)',10000],['r','Growth rate (%)',2],['t','Time periods (t)',5]],calc:v=>{let x=v.p0*Math.pow(1+v.r/100,v.t);return [x,'Estimated amount after '+v.t+' periods.']}},
+continuous:{formula:'P(t) = P₀ × eʳᵗ',desc:'Continuous exponential growth or decay. Use a negative rate for decay.',fields:[['p0','Initial amount (P₀)',10000],['r','Continuous rate (%)',2],['t','Time (t)',5]],calc:v=>{let x=v.p0*Math.exp(v.r/100*v.t);return [x,'Using e ≈ 2.71828. Positive rate = growth; negative rate = decay.']}},
+simple:{formula:'A = P(1 + rt)   •   Interest = A − P',desc:'Simple interest: enter annual rate as a percent.',fields:[['p','Principal (₱ or amount)',10000],['r','Annual interest rate (%)',5],['t','Time (years)',3]],calc:v=>{let a=v.p*(1+v.r/100*v.t);return [a,'Interest earned: '+fmt(a-v.p)+'.']}},
+compound:{formula:'A = P(1 + r/n)ⁿᵗ',desc:'Compound interest, with annual rate entered as a percent.',fields:[['p','Principal (₱ or amount)',10000],['r','Annual interest rate (%)',5],['n','Compounds per year (n)',12],['t','Time (years)',3]],calc:v=>{let a=v.p*Math.pow(1+(v.r/100)/v.n,v.n*v.t);return [a,'Interest earned: '+fmt(a-v.p)+'.']}},
+absolute:{formula:'Eₐ = |xtrue − xapprox|',desc:'Absolute error measures the size of the difference, in the same units as the values.',fields:[['truth','True / actual value',100],['approx','Approximate / predicted value',96]],calc:v=>[Math.abs(v.truth-v.approx),'Absolute difference between the true and approximate values.']},
+relative:{formula:'Eᵣ = |xtrue − xapprox| / |xtrue|',desc:'Relative error is a ratio. True value must not be zero.',fields:[['truth','True / actual value',100],['approx','Approximate / predicted value',96]],calc:v=>{if(v.truth===0)throw Error('True value cannot be zero for relative error.');return [Math.abs(v.truth-v.approx)/Math.abs(v.truth),'Relative error as a ratio. Percentage form: '+fmt(Math.abs(v.truth-v.approx)/Math.abs(v.truth)*100)+'%.']}},
+percentage:{formula:'Eₚ = Eᵣ × 100% = |true − approximate| / |true| × 100%',desc:'Percentage error expresses relative error as a percentage. True value must not be zero.',fields:[['truth','True / actual value',100],['approx','Approximate / predicted value',96]],calc:v=>{if(v.truth===0)throw Error('True value cannot be zero for percentage error.');return [Math.abs(v.truth-v.approx)/Math.abs(v.truth)*100,'Percentage difference relative to the true value.']}},
+temperature:{formula:'°F = (°C × 9/5) + 32   •   °C = (°F − 32) × 5/9',desc:'Convert a temperature in either direction.',fields:[['temp','Temperature value',25],['direction','Direction (0 = °C→°F, 1 = °F→°C)',0]],calc:v=>{let x=v.direction<0.5?v.temp*9/5+32:(v.temp-32)*5/9;return [x,v.direction<0.5?'Degrees Fahrenheit (°F).':'Degrees Celsius (°C).']}},
+water:{formula:'Weekly water use = people × liters/person/day × days',desc:'The lesson uses about 120 liters per person per day. Change this assumption if needed.',fields:[['people','Number of people',4],['daily','Liters per person per day',120],['days','Number of days',7]],calc:v=>[v.people*v.daily*v.days,'Estimated total water use in liters.']},
+electricity:{formula:'Energy (kWh) = power (kW) × hours   •   Cost = kWh × price/kWh',desc:'Estimate energy use and cost for an appliance or group of appliances.',fields:[['power','Power (watts)',1000],['hours','Hours used',5],['days','Days used',30],['price','Price per kWh (₱)',12]],calc:v=>{let kwh=(v.power/1000)*v.hours*v.days;return [kwh*v.price,'Energy used: '+fmt(kwh)+' kWh. Estimated cost in pesos.']}},
+bmi:{formula:'BMI = weight (kg) / height (m)²',desc:'For learning purposes only; BMI is a screening measure, not a diagnosis.',fields:[['weight','Weight (kg)',60],['height','Height (meters)',1.65]],calc:v=>{if(v.height<=0)throw Error('Height must be greater than zero.');return [v.weight/(v.height*v.height),'BMI value (kg/m²). Interpretation depends on age and other factors.']}},
+projectile:{formula:'Flight time = 2v₀sin(θ)/g   •   Max height = (v₀sin θ)²/(2g)   •   Range = v₀²sin(2θ)/g',desc:'Ideal projectile launched and landing at the same height; air resistance ignored. Angle is in degrees.',fields:[['v','Initial speed v₀ (m/s)',20],['angle','Launch angle θ (degrees)',45],['g','Gravity g (m/s²)',9.81]],calc:v=>{if(v.g<=0)throw Error('Gravity must be greater than zero.');let rad=v.angle*Math.PI/180, vy=v.v*Math.sin(rad),time=2*vy/v.g,height=vy*vy/(2*v.g),range=v.v*v.v*Math.sin(2*rad)/v.g;return [range,'Horizontal range: '+fmt(range)+' m • Maximum height: '+fmt(height)+' m • Flight time: '+fmt(time)+' s.']}},
+rainfall:{formula:'Collected water (liters) ≈ rainfall (mm) × catchment area (m²) × efficiency',desc:'Approximate rainwater harvest. Efficiency accounts for losses and is entered as a percent.',fields:[['rain','Rainfall (mm)',20],['area','Roof / catchment area (m²)',50],['eff','Collection efficiency (%)',80]],calc:v=>[v.rain*v.area*v.eff/100,'Estimated collected water in liters (1 mm over 1 m² ≈ 1 liter).']},
+reduction:{formula:'New consumption = original consumption × (1 − reduction rate)',desc:'Calculate consumption after reducing usage by a chosen percentage.',fields:[['original','Original consumption',1000],['rate','Reduction (%)',15]],calc:v=>[v.original*(1-v.rate/100),'Amount saved: '+fmt(v.original*v.rate/100)+'.']}}
+;
+
+const formulaGroups = [
+ {title:'Growth & Finance',items:[
+  ['discrete','Population growth','P₀(1 + r)ᵗ','↗'],
+  ['continuous','Continuous growth / decay','P₀eʳᵗ','∞'],
+  ['simple','Simple interest','A = P(1 + rt)','₱'],
+  ['compound','Compound interest','A = P(1 + r/n)ⁿᵗ','%']
+ ]},
+ {title:'Accuracy & Error',items:[
+  ['absolute','Absolute error','|true − approximate|','±'],
+  ['relative','Relative error','absolute error / |true|','÷'],
+  ['percentage','Percentage error','relative error × 100%','%']
+ ]},
+ {title:'Real-life Models',items:[
+  ['temperature','Temperature conversion','°C ↔ °F','°'],
+  ['water','Water consumption','people × daily use × days','💧'],
+  ['electricity','Electricity cost','kWh × price per kWh','ϟ'],
+  ['bmi','BMI','weight / height²','▦'],
+  ['projectile','Projectile motion','range • height • flight time','↗'],
+  ['rainfall','Rainwater collection','rainfall × area × efficiency','☂'],
+  ['reduction','Consumption reduction','original × (1 − rate)','↓']
+ ]}
+];
+function buildFormulaNav(){
+ const root=$('formulaNavItems');root.innerHTML='';
+ formulaGroups.forEach(group=>{
+  const heading=document.createElement('div');heading.className='menu-title';heading.textContent=group.title;root.append(heading);
+  group.items.forEach(([value,name,formula,symbol])=>{
+   const button=document.createElement('button');button.type='button';button.className='nav-option';button.dataset.formula=value;
+   const icon=document.createElement('span');icon.className='nav-icon';icon.textContent=symbol;
+   const copy=document.createElement('span');copy.className='nav-copy';
+   const title=document.createElement('span');title.className='nav-name';title.textContent=name;
+   const desc=document.createElement('span');desc.className='nav-formula';desc.textContent=formula;
+   copy.append(title,desc);button.append(icon,copy);
+   const check=document.createElement('span');check.className='nav-check';check.textContent='✓';check.hidden=value!==$('formulaSelect').value;button.append(check);
+   if(value===$('formulaSelect').value)button.classList.add('selected');
+   button.addEventListener('click',()=>{
+    $('formulaSection').classList.add('visible');
+    $('formulaSelect').value=value;
+    $('formulaSelect').dispatchEvent(new Event('change'));
+    $('formulaMenu').classList.remove('open');$('formulaFab').setAttribute('aria-expanded','false');
+    $('formulaFab').setAttribute('aria-label','Open formula navigation');
+    $('formulaFab').textContent='＋';
+    buildFormulaNav();
+    $('formulaText').scrollIntoView({behavior:'smooth',block:'nearest'});
+   });
+   root.append(button);
+  });
+ });
+}
+$('formulaFab').addEventListener('click',()=>{
+ const menu=$('formulaMenu'),open=menu.classList.toggle('open');
+ $('formulaFab').setAttribute('aria-expanded',String(open));
+ $('formulaFab').setAttribute('aria-label',open?'Close formula navigation':'Open formula navigation');
+ $('formulaFab').textContent=open?'×':'＋';
+ if(open)buildFormulaNav();
+});
+document.addEventListener('click',e=>{
+ if(!$('formulaMenu').contains(e.target)&&!$('formulaFab').contains(e.target)){
+  $('formulaMenu').classList.remove('open');$('formulaFab').setAttribute('aria-expanded','false');
+  $('formulaFab').setAttribute('aria-label','Open formula navigation');$('formulaFab').textContent='＋';
+ }
+});
+
+function renderFields(){const d=defs[$('formulaSelect').value];$('formulaText').innerHTML='<strong>'+d.formula+'</strong><br><span style="color:#a7a7ad">'+d.desc+'</span>';$('fields').innerHTML='';d.fields.forEach(([id,label,val])=>{const wrap=document.createElement('div');wrap.className='field';const lab=document.createElement('label');lab.htmlFor='f_'+id;lab.textContent=label;const inp=document.createElement('input');inp.id='f_'+id;inp.type='number';inp.step='any';inp.value=val;inp.inputMode='decimal';wrap.append(lab,inp);$('fields').append(wrap);});$('result').style.display='none';}
+function runFormula(){const d=defs[$('formulaSelect').value],v={};for(const [id,label] of d.fields){const el=$('f_'+id);v[id]=Number(el.value);if(el.value.trim()===''||!Number.isFinite(v[id])){showError('Please enter a valid number for every field.');return;}}try{const [value,detail]=d.calc(v);if(!Number.isFinite(value))throw Error('These values do not produce a finite result.');$('resultValue').textContent=fmt(value);$('resultDetail').textContent=detail;$('result').style.display='block';saveHistory(d.formula+' ('+d.fields.map(([id,label])=>label+': '+fmt(v[id])).join(', ')+')',fmt(value));}catch(e){showError(e.message||'Unable to calculate with these values.');}}
+function showError(msg){$('resultValue').textContent='Check inputs';$('resultDetail').textContent=msg;$('result').style.display='block';}
+let deferredInstallPrompt=null;
+const installHelp=$('installHelp');
+function showInstallHelp(){installHelp.hidden=false;}
+function hideInstallHelp(){installHelp.hidden=true;}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;$('installButton').textContent='＋ Install App';});
+window.addEventListener('appinstalled',()=>{$('installButton').textContent='Added ✓';deferredInstallPrompt=null;});
+$('installButton').addEventListener('click',async()=>{
+ if(deferredInstallPrompt){deferredInstallPrompt.prompt();try{await deferredInstallPrompt.userChoice}catch(e){}deferredInstallPrompt=null;return;}
+ const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+ if(isIOS){$('installHelpText').textContent='On iPhone or iPad, use Safari to add FormulaCalc to your Home Screen.';$('installSteps').innerHTML='<li>Open this site in <b>Safari</b>.</li><li>Tap the <b>Share</b> button.</li><li>Scroll and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b> to confirm.</li>';}
+ else {$('installHelpText').textContent='Use your browser menu to install or add this calculator to your Home Screen.';$('installSteps').innerHTML='<li>Open the calculator from its website in Chrome or a compatible browser.</li><li>Tap the <b>⋮ menu</b> near the address bar.</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b>.</li><li>Confirm the prompt.</li>';}
+ showInstallHelp();
+});
+$('closeInstallHelp').addEventListener('click',hideInstallHelp);
+installHelp.addEventListener('click',e=>{if(e.target===installHelp)hideInstallHelp();});
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+$('formulaSelect').addEventListener('change',()=>{renderFields();buildFormulaNav();});$('calculate').addEventListener('click',runFormula);$('historyToggle').addEventListener('click',()=>toggleHistory());$('closeHistory').addEventListener('click',()=>toggleHistory(false));$('clearHistory').addEventListener('click',()=>{calcHistory=[];try{localStorage.removeItem('iphoneCalcHistory')}catch(e){}renderHistory()});$('hideFormula').addEventListener('click',()=>{$('formulaSection').classList.remove('visible');$('formulaMenu').classList.remove('open');$('formulaFab').setAttribute('aria-expanded','false');$('formulaFab').textContent='＋';});renderFields();buildFormulaNav();renderHistory();
+</script>
+</body>
+</html>
