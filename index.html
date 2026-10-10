@@ -92,6 +92,13 @@ body{background:#000;display:block;min-height:100vh;padding:0;}
 .computational-notes li{margin:0 0 6px}
 .notes-formula{padding:12px;background:#202023;border-radius:12px;line-height:1.9;overflow-wrap:anywhere}
 
+/* Compact floating notes icon only: no persistent notes title bar */
+.notes-toggle{display:none!important;}
+.notes-section:not(.open){display:none!important;}
+.notes-section.open{display:flex!important;flex-direction:column!important;}
+.notes-section.open .computational-notes{display:block!important;}
+.notes-fab{width:54px;height:54px;font-size:23px;}
+@media(max-width:520px){.notes-section{right:14px;bottom:88px;width:min(380px,calc(100vw - 28px));}}
 </style>
 </head>
 <body>
@@ -162,6 +169,8 @@ body{background:#000;display:block;min-height:100vh;padding:0;}
     <div id="fields" class="field-grid"></div>
     <button id="calculate" class="calculate">Calculate result</button>
     <div id="result" class="result" aria-live="polite"><div class="rlabel">Result</div><div id="resultValue" class="rvalue"></div><div id="resultDetail" class="detail"></div></div>
+    <button id="solutionToggle" class="solution-toggle" type="button" aria-expanded="false" aria-controls="solutionPanel">Show step-by-step solution <span>⌄</span></button>
+    <div id="solutionPanel" class="solution-panel" hidden aria-live="polite"></div>
   </section>
   <div class="note">Formula mode follows the topics in your uploaded lessons. Results are estimates; models depend on their assumptions. For projectile motion, air resistance is ignored.</div>
 </main>
@@ -273,8 +282,31 @@ document.addEventListener('click',e=>{
  }
 });
 
-function renderFields(){const d=defs[$('formulaSelect').value];$('formulaText').innerHTML='<strong>'+d.formula+'</strong><br><span style="color:#a7a7ad">'+d.desc+'</span>';$('fields').innerHTML='';d.fields.forEach(([id,label,val])=>{const wrap=document.createElement('div');wrap.className='field';const lab=document.createElement('label');lab.htmlFor='f_'+id;lab.textContent=label;const inp=document.createElement('input');inp.id='f_'+id;inp.type='number';inp.step='any';inp.value=val;inp.inputMode='decimal';wrap.append(lab,inp);$('fields').append(wrap);});$('result').style.display='none';}
-function runFormula(){const d=defs[$('formulaSelect').value],v={};for(const [id,label] of d.fields){const el=$('f_'+id);v[id]=Number(el.value);if(el.value.trim()===''||!Number.isFinite(v[id])){showError('Please enter a valid number for every field.');return;}}try{const [value,detail]=d.calc(v);if(!Number.isFinite(value))throw Error('These values do not produce a finite result.');$('resultValue').textContent=fmt(value);$('resultDetail').textContent=detail;$('result').style.display='block';saveHistory(d.formula+' ('+d.fields.map(([id,label])=>label+': '+fmt(v[id])).join(', ')+')',fmt(value));}catch(e){showError(e.message||'Unable to calculate with these values.');}}
+function renderFields(){const d=defs[$('formulaSelect').value];$('formulaText').innerHTML='<strong>'+d.formula+'</strong><br><span style="color:#a7a7ad">'+d.desc+'</span>';$('fields').innerHTML='';d.fields.forEach(([id,label,val])=>{const wrap=document.createElement('div');wrap.className='field';const lab=document.createElement('label');lab.htmlFor='f_'+id;lab.textContent=label;const inp=document.createElement('input');inp.id='f_'+id;inp.type='number';inp.step='any';inp.value=val;inp.inputMode='decimal';wrap.append(lab,inp);$('fields').append(wrap);});$('result').style.display='none';$('solutionToggle').classList.remove('visible');$('solutionPanel').hidden=true;$('solutionToggle').setAttribute('aria-expanded','false');}
+function makeSolution(id,d,v,value){
+ const steps=[];const add=(title,body)=>steps.push({title,body});
+ const n=x=>fmt(x);
+ add('1. Identify the formula',d.formula);
+ add('2. Write down the given values',d.fields.map(([key,label])=>label+': '+n(v[key])).join(' • '));
+ switch(id){
+  case 'discrete': add('3. Convert the rate to a decimal','r = '+n(v.r)+' ÷ 100 = '+n(v.r/100));add('4. Substitute into the model','P(t) = '+n(v.p0)+' × (1 + '+n(v.r/100)+')^'+n(v.t));add('5. Evaluate','P(t) = '+n(v.p0)+' × '+n(Math.pow(1+v.r/100,v.t))+' = '+n(value));break;
+  case 'continuous': add('3. Convert the rate to a decimal','r = '+n(v.r)+' ÷ 100 = '+n(v.r/100));add('4. Substitute','P(t) = '+n(v.p0)+' × e^('+n(v.r/100)+' × '+n(v.t)+')');add('5. Evaluate','P(t) = '+n(value));break;
+  case 'simple': add('3. Convert the rate to a decimal','r = '+n(v.r)+' ÷ 100 = '+n(v.r/100));add('4. Substitute','A = '+n(v.p)+' × (1 + '+n(v.r/100)+' × '+n(v.t)+')');add('5. Calculate the total and interest','A = '+n(value)+'; interest = A − P = '+n(value)+' − '+n(v.p)+' = '+n(value-v.p));break;
+  case 'compound': {const rate=v.r/100;add('3. Convert the annual rate','r = '+n(v.r)+' ÷ 100 = '+n(rate));add('4. Substitute','A = '+n(v.p)+' × (1 + '+n(rate)+' ÷ '+n(v.n)+')^('+n(v.n)+' × '+n(v.t)+')');add('5. Evaluate','A = '+n(value)+'; interest = A − P = '+n(value-v.p));break;}
+  case 'absolute': add('3. Find the difference','xtrue − xapprox = '+n(v.truth)+' − '+n(v.approx)+' = '+n(v.truth-v.approx));add('4. Take the absolute value','Ea = |'+n(v.truth-v.approx)+'| = '+n(value));break;
+  case 'relative': case 'percentage': {const abs=Math.abs(v.truth-v.approx),rel=abs/Math.abs(v.truth);add('3. Find absolute error','Ea = |'+n(v.truth)+' − '+n(v.approx)+'| = '+n(abs));add('4. Divide by the absolute true value','Er = '+n(abs)+' ÷ |'+n(v.truth)+'| = '+n(rel));if(id==='percentage')add('5. Convert to percent','Ep = '+n(rel)+' × 100% = '+n(value)+'%');else add('5. State relative error','Er = '+n(value));break;}
+  case 'temperature': if(v.direction<.5){add('3. Substitute into °F = (°C × 9/5) + 32','°F = ('+n(v.temp)+' × 9/5) + 32');add('4. Calculate','°F = '+n(value)+' °F');}else{add('3. Substitute into °C = (°F − 32) × 5/9','°C = ('+n(v.temp)+' − 32) × 5/9');add('4. Calculate','°C = '+n(value)+' °C');}break;
+  case 'water': add('3. Multiply people by daily use',''+n(v.people)+' × '+n(v.daily)+' = '+n(v.people*v.daily)+' liters per day');add('4. Multiply by the number of days',''+n(v.people*v.daily)+' × '+n(v.days)+' = '+n(value)+' liters');break;
+  case 'electricity': {const kwh=v.power/1000*v.hours*v.days;add('3. Convert watts to kilowatts','Power = '+n(v.power)+' ÷ 1000 = '+n(v.power/1000)+' kW');add('4. Calculate energy used','kWh = '+n(v.power/1000)+' × '+n(v.hours)+' × '+n(v.days)+' = '+n(kwh)+' kWh');add('5. Calculate cost','Cost = '+n(kwh)+' × ₱'+n(v.price)+' = ₱'+n(value));break;}
+  case 'bmi': add('3. Square the height','height² = '+n(v.height)+' × '+n(v.height)+' = '+n(v.height*v.height)+' m²');add('4. Divide weight by height squared','BMI = '+n(v.weight)+' ÷ '+n(v.height*v.height)+' = '+n(value));break;
+  case 'projectile': {const rad=v.angle*Math.PI/180,vy=v.v*Math.sin(rad),h=vy*vy/(2*v.g),t=2*vy/v.g;add('3. Convert the angle to radians','θ = '+n(v.angle)+' × π/180 = '+n(rad));add('4. Calculate flight time','t = 2v₀sin(θ)/g = '+n(t)+' s');add('5. Calculate maximum height','h = (v₀sin θ)²/(2g) = '+n(h)+' m');add('6. Calculate horizontal range','R = v₀²sin(2θ)/g = '+n(value)+' m');break;}
+  case 'rainfall': add('3. Convert efficiency to decimal','Efficiency = '+n(v.eff)+' ÷ 100 = '+n(v.eff/100));add('4. Substitute into the collection formula','Liters ≈ '+n(v.rain)+' × '+n(v.area)+' × '+n(v.eff/100));add('5. Calculate collected water','Collected water ≈ '+n(value)+' liters');break;
+  case 'reduction': add('3. Convert reduction to decimal','Rate = '+n(v.rate)+' ÷ 100 = '+n(v.rate/100));add('4. Find the remaining fraction','1 − '+n(v.rate/100)+' = '+n(1-v.rate/100));add('5. Multiply by original consumption','New consumption = '+n(v.original)+' × '+n(1-v.rate/100)+' = '+n(value)+'; saved = '+n(v.original-value));break;
+ }
+ add('Final answer',n(value));
+ return '<h3>Step-by-step solution</h3>'+steps.map((st,i)=>'<div class="solution-step '+(i===steps.length-1?'solution-final':'')+'"><b>'+st.title+'</b>'+st.body+'</div>').join('');
+}
+function runFormula(){const id=$('formulaSelect').value,d=defs[id],v={};for(const [key,label] of d.fields){const el=$('f_'+key);v[key]=Number(el.value);if(el.value.trim()===''||!Number.isFinite(v[key])){showError('Please enter a valid number for every field.');return;}}try{const [value,detail]=d.calc(v);if(!Number.isFinite(value))throw Error('These values do not produce a finite result.');$('resultValue').textContent=fmt(value);$('resultDetail').textContent=detail;$('result').style.display='block';$('solutionPanel').innerHTML=makeSolution(id,d,v,value);$('solutionPanel').hidden=true;$('solutionToggle').classList.add('visible');$('solutionToggle').setAttribute('aria-expanded','false');saveHistory(d.formula+' ('+d.fields.map(([key,label])=>label+': '+fmt(v[key])).join(', ')+')',fmt(value));}catch(e){showError(e.message||'Unable to calculate with these values.');}}
 function showError(msg){$('resultValue').textContent='Check inputs';$('resultDetail').textContent=msg;$('result').style.display='block';}
 let deferredInstallPrompt=null;
 const installHelp=$('installHelp');
@@ -292,7 +324,7 @@ $('installButton').addEventListener('click',async()=>{
 $('closeInstallHelp').addEventListener('click',hideInstallHelp);
 installHelp.addEventListener('click',e=>{if(e.target===installHelp)hideInstallHelp();});
 if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
-$('installButton').addEventListener('click',()=>{const section=$('formulaSection');section.classList.toggle('visible');if(section.classList.contains('visible'))section.scrollIntoView({behavior:'smooth',block:'start'});});$('formulaSelect').addEventListener('change',()=>{renderFields();buildFormulaNav();});$('calculate').addEventListener('click',runFormula);$('historyToggle').addEventListener('click',()=>toggleHistory());$('closeHistory').addEventListener('click',()=>toggleHistory(false));$('clearHistory').addEventListener('click',()=>{calcHistory=[];try{localStorage.removeItem('iphoneCalcHistory')}catch(e){}renderHistory()});$('hideFormula').addEventListener('click',()=>{$('formulaSection').classList.remove('visible');$('formulaMenu').classList.remove('open');$('formulaFab').setAttribute('aria-expanded','false');$('formulaFab').textContent='＋';});renderFields();buildFormulaNav();renderHistory();
+$('installButton').addEventListener('click',()=>{const section=$('formulaSection');section.classList.toggle('visible');if(section.classList.contains('visible'))section.scrollIntoView({behavior:'smooth',block:'start'});});$('formulaSelect').addEventListener('change',()=>{renderFields();buildFormulaNav();});$('calculate').addEventListener('click',runFormula);$('solutionToggle').addEventListener('click',()=>{const panel=$('solutionPanel'),opening=panel.hidden;panel.hidden=!opening;$('solutionToggle').setAttribute('aria-expanded',String(opening));$('solutionToggle').firstElementChild.textContent=opening?'⌃':'⌄';});$('historyToggle').addEventListener('click',()=>toggleHistory());$('closeHistory').addEventListener('click',()=>toggleHistory(false));$('clearHistory').addEventListener('click',()=>{calcHistory=[];try{localStorage.removeItem('iphoneCalcHistory')}catch(e){}renderHistory()});$('hideFormula').addEventListener('click',()=>{$('formulaSection').classList.remove('visible');$('formulaMenu').classList.remove('open');$('formulaFab').setAttribute('aria-expanded','false');$('formulaFab').textContent='＋';});renderFields();buildFormulaNav();renderHistory();
 const notesToggle=$('notesToggle');
 const notesSection=$('notesSection');
 const notesFab=$('notesFab');
@@ -325,4 +357,10 @@ body{background:#000!important;color:#f5f5f7!important;display:flex!important;ju
 .fab-wrap{right:max(22px,calc((100vw - 520px)/2 + 18px))!important;bottom:22px!important}
 @media(max-width:520px){body{padding:12px 10px!important;align-items:flex-start!important}.app{width:100%!important;min-height:calc(100svh - 24px)!important;padding:max(16px,env(safe-area-inset-top)) 17px max(20px,env(safe-area-inset-bottom))!important;border-radius:48px!important;border:2px solid #29292c!important;box-shadow:0 0 0 1px #111!important}.display{min-height:clamp(125px,25vh,190px)!important}.keys{gap:clamp(7px,2vw,10px)!important}.key{font-size:clamp(24px,7vw,35px)!important}}
 @media(min-width:700px){body{padding-top:28px!important;padding-bottom:28px!important}.app{min-height:0!important}.screen{min-height:0!important}}
+
+/* Step-by-step solution panel */
+.solution-toggle{display:none;width:100%;margin-top:10px;padding:13px 15px;border:1px solid #38383d;border-radius:14px;background:#222225;color:#f5f5f7;font:inherit;font-size:14px;font-weight:600;text-align:left;cursor:pointer;justify-content:space-between;align-items:center;gap:10px}
+.solution-toggle.visible{display:flex}.solution-toggle span{color:var(--orange);font-size:20px}
+.solution-panel{margin-top:10px;padding:15px;border:1px solid #343438;border-radius:16px;background:#151517;color:#dedee3;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.solution-panel[hidden]{display:none}.solution-panel h3{font-size:14px;color:#ffb340;margin:0 0 10px}.solution-step{padding:10px 11px;margin:8px 0;border-radius:11px;background:#222225}.solution-step b{display:block;color:#fff;margin-bottom:3px}.solution-final{color:#a7e7b4;border:1px solid #31533a;background:#102016}
 </style>
